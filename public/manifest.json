@@ -1,0 +1,22 @@
+{
+  "name": "Frutero PWA Starter",
+  "short_name": "Frutero App",
+  "icons": [
+    {
+      "src": "/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0D041E",
+  "background_color": "#0D041E",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
