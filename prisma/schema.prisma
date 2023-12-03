@@ -19,8 +19,51 @@ model User {
   website               String?
   avatar_url            String?
   banner_url            String?
+  products              Product[]
+  projects              Project[]
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
 
   @@index([wallet, username, email])
+}
+
+model Project {
+  id                    String              @id @default(uuid())
+  wallet                String              @unique
+  name                  String              @unique
+  email                 String              @unique
+  website               String              @unique
+  description           String?
+  avatar_url            String?
+  banner_url            String?
+  token_address         String?
+  category              String
+  ownerId               String
+  owner                 User                @relation(fields: [ownerId], references: [id])
+  products              Product[]
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@index([wallet, name, email, ownerId, category]) 
+}
+
+model Product {
+  id                    String              @id @default(uuid())
+  name                  String
+  description           String
+  image_url             String
+  quantity              String
+  price                 String
+  token_address         String?
+  size                  String
+  category              String
+  brand                 String
+  ownerId               String
+  owner                 User                @relation(fields: [ownerId], references: [id])
+  projectId             String?
+  project               Project?            @relation(fields: [projectId], references: [id])
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@index([brand, projectId, ownerId, category]) 
 }

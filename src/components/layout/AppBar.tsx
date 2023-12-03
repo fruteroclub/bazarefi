@@ -10,6 +10,7 @@ import { api } from "~/utils/api";
 
 import {
   BellIcon,
+  CalendarIcon,
   CopyIcon,
   ExternalLinkIcon,
   HamburgerIcon,
@@ -202,7 +203,20 @@ const MenuDrawer = ({
                 <>
                   <ListItem display="flex" alignItems="center">
                     <Link
-                      href="/account"
+                      href="/marketplace"
+                      display="flex"
+                      w="full"
+                      alignItems="center"
+                      gap={4}
+                      onClick={onClose}
+                    >
+                      <CalendarIcon />
+                      Artículos publicados
+                    </Link>
+                  </ListItem>
+                  <ListItem display="flex" alignItems="center">
+                    <Link
+                      href="/attestations"
                       display="flex"
                       w="full"
                       alignItems="center"
@@ -219,7 +233,7 @@ const MenuDrawer = ({
                         <path d="M20 2H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zm-6 2.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5zM19 15H9v-.25C9 12.901 11.254 11 14 11s5 1.901 5 3.75V15z" />
                         <path d="M4 8H2v12c0 1.103.897 2 2 2h12v-2H4V8z" />
                       </Icon>
-                      Mi Perfil
+                      Atestaciones
                     </Link>
                   </ListItem>
                   <ListItem display="flex" alignItems="center">
@@ -404,6 +418,7 @@ export const AppBar: React.FC<AppBarProps> = () => {
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
+        zIndex={100}
       >
         <Box
           display="flex"
@@ -423,6 +438,12 @@ export const AppBar: React.FC<AppBarProps> = () => {
             </Text>
           </Link>
           <Flex alignItems="center" gap={4}>
+            <Link href="/atestaciones" fontWeight="semibold">
+              Atestaciones
+            </Link>
+            <Link href="/proyectos" fontWeight="semibold">
+              Proyectos
+            </Link>
             <MenuDrawer
               isAuthenticated={isAuthenticated}
               isLoading={isLoading}
@@ -449,7 +470,7 @@ export const PageWithAppBar: React.FC<
         position="absolute"
         top={`${APPBAR_HEIGHT_PX}px`}
         sx={{
-          height: `calc(100svh - ${APPBAR_HEIGHT_PX}px - ${NAVBAR_HEIGHT_PX}px)`,
+          minHeight: `calc(100svh - ${APPBAR_HEIGHT_PX}px - ${NAVBAR_HEIGHT_PX}px)`,
           width: "100vw",
           overflow: "scroll",
           overflowX: "hidden",

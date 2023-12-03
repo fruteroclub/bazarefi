@@ -68,17 +68,17 @@ const theme = extendTheme({
           },
         },
         outline: {
-          bg: "brandBlack",
-          boxShadow: "inset 0 0 0 2px #f25b3d",
-          color: "primary",
+          bg: "brandWhite",
+          boxShadow: "inset 0 0 0 2px #19083C",
+          color: "secondary",
           fontWeight: "semibold",
           _disabled: {
-            bg: "brandBlack",
-            boxShadow: "inset 0 0 0 2px #f25b3d",
+            bg: "gray.400",
+            boxShadow: "inset 0 0 0 2px #19083C",
             color: "primary",
           },
           _hover: {
-            bg: "ldBlackJet.700",
+            bg: "purple.100",
           },
         },
         "black-outline": {
