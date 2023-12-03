@@ -3,11 +3,11 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import { api } from "~/utils/api";
 
-// import "~/styles/globals.css";
+import theme from "~/theme";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <Component {...pageProps} />
     </ChakraProvider>
   );
