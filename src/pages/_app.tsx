@@ -4,11 +4,16 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { PrivyWagmiConnector } from "@privy-io/wagmi-connector";
 import { chainsConfig } from "~/lib/wagmiPrivyClient";
 
+import { initializeFirebase } from "~/lib/firebase";
+
 import { api } from "~/utils/api";
 
 import theme from "~/theme";
+import { NoSSR } from "~/components/NoSSR";
 
 const PRIVY_APP_ID = process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "";
+
+initializeFirebase();
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
@@ -29,7 +34,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     >
       <PrivyWagmiConnector wagmiChainsConfig={chainsConfig}>
         <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
+          <NoSSR>
+            <Component {...pageProps} />
+          </NoSSR>
         </ChakraProvider>
       </PrivyWagmiConnector>
     </PrivyProvider>
