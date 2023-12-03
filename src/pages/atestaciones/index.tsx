@@ -8,7 +8,7 @@ import { PageWithAppBar } from "~/components/layout/AppBar";
 import ProductCard from "~/components/cards/ProductCard";
 import { Link } from "@chakra-ui/next-js";
 
-const Marketplace = () => {
+const Attestations = () => {
   const { authenticated: isAuthenticated, ready, user: privyUser } = usePrivy();
   // const { data: products, status: fetchProductsStatus } =
   //   api.products.getUserProducts.useQuery(
@@ -29,9 +29,9 @@ const Marketplace = () => {
         px={8}
         width={["100%", null, "80%"]}
       >
-        <Heading mb={6}>Marketplace</Heading>
+        <Heading mb={6}>Atestaciones</Heading>
         {isAuthenticated && (
-          <Link href="/marketplace/publicar">
+          <Link href="/atestaciones/publicar">
             <Button variant="primary">Publicar</Button>
           </Link>
         )}
@@ -52,4 +52,4 @@ const Marketplace = () => {
   );
 };
 
-export default Marketplace;
+export default Attestations;

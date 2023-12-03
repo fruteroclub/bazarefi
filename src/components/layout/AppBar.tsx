@@ -437,11 +437,26 @@ export const AppBar: React.FC<AppBarProps> = () => {
               Bazarefi
             </Text>
           </Link>
-          <Flex alignItems="center" gap={4}>
-            <Link href="/atestaciones" fontWeight="semibold">
+          <Flex alignItems="center" gap={8}>
+            <Link
+              href="/marketplace"
+              fontWeight="semibold"
+              display={["none", null, "block"]}
+            >
+              Bazar
+            </Link>
+            <Link
+              href="/atestaciones"
+              fontWeight="semibold"
+              display={["none", null, "block"]}
+            >
               Atestaciones
             </Link>
-            <Link href="/proyectos" fontWeight="semibold">
+            <Link
+              href="/proyectos"
+              fontWeight="semibold"
+              display={["none", null, "block"]}
+            >
               Proyectos
             </Link>
             <MenuDrawer
