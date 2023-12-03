@@ -1,4 +1,6 @@
+import { ColorModeScript } from "@chakra-ui/react";
 import { Html, Head, Main, NextScript } from "next/document";
+import theme from "~/theme";
 
 export default function Document() {
   return (
@@ -29,6 +31,18 @@ export default function Document() {
         <meta name="msapplication-TileColor" content="#0D041E" />
       </Head>
       <body>
+        <ColorModeScript
+          initialColorMode={
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            theme.config.initialColorMode as
+              | "light"
+              | "dark"
+              | "system"
+              | undefined
+          }
+          key="chakra-ui-no-flash"
+          storageKey="chakra-ui-color-mode"
+        />
         <Main />
         <NextScript />
       </body>

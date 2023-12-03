@@ -1,5 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "@chakra-ui/next-js";
+import {
+  type ConnectedWallet,
+  useWallets,
+  usePrivy,
+} from "@privy-io/react-auth";
 
 import { BellIcon, HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
 import {
@@ -33,6 +38,7 @@ export interface AppBarProps {
 type MenuDrawerProps = {
   isAuthenticated: boolean;
   isLoading: boolean;
+  isReady: boolean;
   onSigninHandler: () => void;
   onSignoutHandler: () => void;
 };
@@ -40,6 +46,7 @@ type MenuDrawerProps = {
 const MenuDrawer = ({
   isAuthenticated,
   isLoading,
+  isReady,
   onSigninHandler,
   onSignoutHandler,
 }: MenuDrawerProps) => {
@@ -110,7 +117,7 @@ const MenuDrawer = ({
                         <path d="M20 2H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zm-6 2.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5zM19 15H9v-.25C9 12.901 11.254 11 14 11s5 1.901 5 3.75V15z" />
                         <path d="M4 8H2v12c0 1.103.897 2 2 2h12v-2H4V8z" />
                       </Icon>
-                      Account
+                      Mi Cuenta
                     </Link>
                   </ListItem>
                   <ListItem display="flex" alignItems="center">
@@ -123,7 +130,7 @@ const MenuDrawer = ({
                       onClick={onClose}
                     >
                       <SettingsIcon boxSize={5} />
-                      Settings
+                      Configuración
                     </Link>
                   </ListItem>
                   <ListItem display="flex" alignItems="center">
@@ -136,7 +143,7 @@ const MenuDrawer = ({
                       onClick={onClose}
                     >
                       <BellIcon boxSize={5} />
-                      Notifications
+                      Notificaciones
                     </Link>
                   </ListItem>
                 </>
@@ -150,7 +157,7 @@ const MenuDrawer = ({
                       gap={4}
                       onClick={onClose}
                     >
-                      Home
+                      Inicio
                     </Link>
                   </ListItem>
                   <ListItem display="flex" alignItems="center">
@@ -172,7 +179,7 @@ const MenuDrawer = ({
                       gap={4}
                       onClick={onClose}
                     >
-                      Community
+                      Comunidad
                     </Link>
                   </ListItem>
                   <ListItem display="flex" alignItems="center">
@@ -183,13 +190,13 @@ const MenuDrawer = ({
                       gap={4}
                       onClick={onClose}
                     >
-                      About
+                      Nosotros
                     </Link>
                   </ListItem>
                 </>
               )}
             </List>
-            {!isAuthenticated && (
+            {isReady && !isAuthenticated && (
               <Flex px={12} mt={8}>
                 <Button
                   variant="primary"
@@ -197,12 +204,12 @@ const MenuDrawer = ({
                   w="full"
                   onClick={() => onSigninHandler()}
                 >
-                  Login
+                  Ingresar
                 </Button>
               </Flex>
             )}
           </DrawerBody>
-          {isAuthenticated && (
+          {isReady && isAuthenticated && (
             <DrawerFooter px={12}>
               <Button
                 variant="secondary"
@@ -229,14 +236,29 @@ const MenuDrawer = ({
 export const AppBar: React.FC<AppBarProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Hardcoded to show login/logout UI, replace with your own auth
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const login = async () => setIsAuthenticated(true);
-  const logout = async () => setIsAuthenticated(false);
+  const {
+    authenticated: isAuthenticated,
+    login,
+    logout,
+    ready: isReady,
+    user,
+  } = usePrivy();
+  const { wallets } = useWallets();
+  const currentWallet = useRef<ConnectedWallet | null>(wallets[0] ?? null);
+
+  useEffect(() => {
+    currentWallet.current = wallets[0] ?? null;
+    console.log(currentWallet.current);
+  }, [wallets]);
+
+  useEffect(() => {
+    console.log("user", user);
+  }, [user]);
+
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      await login();
+      login();
     } catch (error) {
       console.error(error);
     } finally {
@@ -283,6 +305,7 @@ export const AppBar: React.FC<AppBarProps> = () => {
           <MenuDrawer
             isAuthenticated={isAuthenticated}
             isLoading={isLoading}
+            isReady={isReady}
             onSigninHandler={handleLogin}
             onSignoutHandler={handleLogout}
           />

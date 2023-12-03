@@ -1,15 +1,38 @@
 import { type AppType } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
+import { PrivyProvider } from "@privy-io/react-auth";
+import { PrivyWagmiConnector } from "@privy-io/wagmi-connector";
+import { chainsConfig } from "~/lib/wagmiPrivyClient";
 
 import { api } from "~/utils/api";
 
 import theme from "~/theme";
 
+const PRIVY_APP_ID = process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "";
+
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
-    <ChakraProvider theme={theme}>
-      <Component {...pageProps} />
-    </ChakraProvider>
+    <PrivyProvider
+      appId={PRIVY_APP_ID}
+      config={{
+        loginMethods: ["wallet", "google", "github", "email"],
+        appearance: {
+          theme: "dark",
+          accentColor: "#C4088F",
+          logo: "https://1drv.ms/i/s!AvNhxv8YI_Ipgcl2FgNp7Bo6XqoBtA?e=Yymxw9",
+        },
+        embeddedWallets: {
+          createOnLogin: "all-users",
+          noPromptOnSignature: true,
+        },
+      }}
+    >
+      <PrivyWagmiConnector wagmiChainsConfig={chainsConfig}>
+        <ChakraProvider theme={theme}>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </PrivyWagmiConnector>
+    </PrivyProvider>
   );
 };
 
