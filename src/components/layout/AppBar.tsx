@@ -6,8 +6,17 @@ import {
   usePrivy,
 } from "@privy-io/react-auth";
 
-import { BellIcon, HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
+import { api } from "~/utils/api";
+
 import {
+  BellIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+  HamburgerIcon,
+  SettingsIcon,
+} from "@chakra-ui/icons";
+import {
+  Avatar,
   Box,
   Button,
   Drawer,
@@ -18,14 +27,23 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
+  Heading,
   Icon,
   IconButton,
   Image,
   List,
   ListItem,
   Text,
+  useClipboard,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
+
+import UserProfileModal from "~/components/modals/UserProfileModal";
+import { type User } from "~/types";
+import { shortenAddress } from "~/utils/string";
+import { zeroAddress } from "viem";
+import config from "~/config";
 
 export const APPBAR_HEIGHT_PX = 56;
 export const NAVBAR_HEIGHT_PX = 0;
@@ -41,6 +59,7 @@ type MenuDrawerProps = {
   isReady: boolean;
   onSigninHandler: () => void;
   onSignoutHandler: () => void;
+  user: User | null | undefined;
 };
 
 const MenuDrawer = ({
@@ -49,29 +68,45 @@ const MenuDrawer = ({
   isReady,
   onSigninHandler,
   onSignoutHandler,
+  user,
 }: MenuDrawerProps) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef<HTMLButtonElement>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { onCopy } = useClipboard(user?.wallet ?? "");
+  const toast = useToast();
 
   return (
     <>
-      <IconButton
-        onClick={onOpen}
-        ref={btnRef}
-        variant="unstyled"
-        aria-label="Menús"
-        icon={
-          <HamburgerIcon
-            color="brandWhite"
-            h={[8, null, 7]}
-            w={[8, null, 7]}
-            _hover={{
-              color: "primary",
-            }}
-          />
-        }
-        size="md"
-      />
+      {isAuthenticated ? (
+        <Avatar
+          _hover={{
+            cursor: "pointer",
+          }}
+          size="sm"
+          name={user?.username}
+          src={user?.avatar_url ?? ""}
+          onClick={onOpen}
+          mr={2}
+        />
+      ) : (
+        <IconButton
+          onClick={onOpen}
+          ref={btnRef}
+          variant="unstyled"
+          aria-label="Menús"
+          icon={
+            <HamburgerIcon
+              color="brandWhite"
+              h={[8, null, 7]}
+              w={[8, null, 7]}
+              _hover={{
+                color: "primary",
+              }}
+            />
+          }
+          size="md"
+        />
+      )}
       <Drawer
         size={["full", null, "xs", null, "sm"]}
         isOpen={isOpen}
@@ -91,8 +126,75 @@ const MenuDrawer = ({
             color="brandWhite"
             _hover={{ background: "transparent", color: "primary" }}
           />
-          <DrawerHeader color="primary" fontSize={["2xl"]}>
-            Menu
+          <DrawerHeader fontSize={["2xl"]}>
+            {isAuthenticated ? (
+              <Flex width="100%">
+                <Link href={`/u/${user?.username}`}>
+                  <Avatar
+                    size="lg"
+                    name={user?.username}
+                    src={user?.avatar_url ?? ""}
+                    onClick={onOpen}
+                    left={0}
+                  />
+                </Link>
+                <Flex
+                  flexDirection="column"
+                  justifyContent="center"
+                  px={2}
+                  width="100%"
+                >
+                  <Heading fontSize={["2xl"]} fontWeight="semibold">
+                    {user?.username}
+                  </Heading>
+                  <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width="100%"
+                    pr={8}
+                    pl={2}
+                  >
+                    <Heading fontSize={["lg"]} fontWeight="normal">
+                      {shortenAddress(user?.wallet ?? zeroAddress)}
+                    </Heading>
+                    <Flex gap={4}>
+                      <Link
+                        href={`${config.blockExplorers.celo.explorer}/address/${user?.wallet}`}
+                        display="flex"
+                        w="full"
+                        alignItems="center"
+                        gap={2}
+                        onClick={onClose}
+                        target="_blank"
+                      >
+                        <IconButton
+                          aria-label="View wallet on block explorer"
+                          icon={<ExternalLinkIcon />}
+                          isRound={true}
+                          size="sm"
+                        />
+                      </Link>
+                      <IconButton
+                        aria-label="Copy wallet address to clipboard"
+                        icon={<CopyIcon />}
+                        isRound={true}
+                        size="sm"
+                        onClick={() => {
+                          onCopy();
+                          toast({
+                            status: "info",
+                            description: "Address copied to clipboard",
+                            isClosable: true,
+                          });
+                        }}
+                      />
+                    </Flex>
+                  </Flex>
+                </Flex>
+              </Flex>
+            ) : (
+              <Heading>Menú</Heading>
+            )}
           </DrawerHeader>
           <DrawerBody px={12}>
             <List spacing={4} fontSize={["xl"]}>
@@ -117,7 +219,7 @@ const MenuDrawer = ({
                         <path d="M20 2H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zm-6 2.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5zM19 15H9v-.25C9 12.901 11.254 11 14 11s5 1.901 5 3.75V15z" />
                         <path d="M4 8H2v12c0 1.103.897 2 2 2h12v-2H4V8z" />
                       </Icon>
-                      Mi Cuenta
+                      Mi Perfil
                     </Link>
                   </ListItem>
                   <ListItem display="flex" alignItems="center">
@@ -241,19 +343,23 @@ export const AppBar: React.FC<AppBarProps> = () => {
     login,
     logout,
     ready: isReady,
-    user,
+    user: privyUser,
   } = usePrivy();
   const { wallets } = useWallets();
   const currentWallet = useRef<ConnectedWallet | null>(wallets[0] ?? null);
 
-  useEffect(() => {
-    currentWallet.current = wallets[0] ?? null;
-    console.log(currentWallet.current);
-  }, [wallets]);
+  const {
+    data: user,
+    refetch: refetchUpdatedUser,
+    status: fetchUserStatus,
+  } = api.users.getUserById.useQuery(
+    { id: privyUser?.id ?? "" },
+    {
+      enabled: Boolean(privyUser?.id && isAuthenticated),
+    }
+  );
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+  const notSignedUp = fetchUserStatus === "success" && !user;
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -276,42 +382,59 @@ export const AppBar: React.FC<AppBarProps> = () => {
     }
   };
 
+  useEffect(() => {
+    currentWallet.current = wallets[0] ?? null;
+    console.log(currentWallet.current);
+  }, [wallets]);
+
   return (
-    <Box
-      as="nav"
-      position="fixed"
-      top={0}
-      width="100vw"
-      height={`${APPBAR_HEIGHT_PX}px`}
-      p={[4, null, null, 8]}
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-    >
+    <>
+      <UserProfileModal
+        notSignedUp={notSignedUp}
+        refetchUser={refetchUpdatedUser}
+      />
       <Box
+        as="nav"
+        position="fixed"
+        top={0}
+        width="100vw"
+        height={`${APPBAR_HEIGHT_PX}px`}
+        p={[4, null, null, 8]}
         display="flex"
+        flexDirection="column"
         alignItems="center"
-        justifyContent="space-between"
-        w="100%"
+        justifyContent="center"
       >
-        <Link as="div" display="flex" gap={2} alignItems="center" href="/">
-          <Image src="/logos/fruta-logo.png" alt="Bazarefi logo" h={7} w={7} />
-          <Text fontSize="2xl" fontWeight="bold">
-            Bazarefi
-          </Text>
-        </Link>
-        <Flex alignItems="center" gap={4}>
-          <MenuDrawer
-            isAuthenticated={isAuthenticated}
-            isLoading={isLoading}
-            isReady={isReady}
-            onSigninHandler={handleLogin}
-            onSignoutHandler={handleLogout}
-          />
-        </Flex>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          w="100%"
+        >
+          <Link as="div" display="flex" gap={2} alignItems="center" href="/">
+            <Image
+              src="/logos/fruta-logo.png"
+              alt="Bazarefi logo"
+              h={7}
+              w={7}
+            />
+            <Text fontSize="2xl" fontWeight="bold">
+              Bazarefi
+            </Text>
+          </Link>
+          <Flex alignItems="center" gap={4}>
+            <MenuDrawer
+              isAuthenticated={isAuthenticated}
+              isLoading={isLoading}
+              isReady={isReady}
+              onSigninHandler={handleLogin}
+              onSignoutHandler={handleLogout}
+              user={user}
+            />
+          </Flex>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

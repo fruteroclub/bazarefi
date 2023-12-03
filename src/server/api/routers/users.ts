@@ -14,6 +14,8 @@ export const usersRouter = createTRPCRouter({
         wallet: z.string().regex(walletRegex),
         username: z.string().trim().regex(usernameRegex),
         email: z.string().email().optional(),
+        bio: z.string().optional(),
+        avatar_url: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -56,11 +58,11 @@ export const usersRouter = createTRPCRouter({
         where: { id: input.id },
       });
 
-      if (!user) {
-        throw new Error("No existe el usuario");
-      }
+      // if (!user) {
+      //   throw new Error("No existe el usuario");
+      // }
 
-      return user;
+      return user ?? null;
     }),
 
   getUserByWallet: publicProcedure
@@ -71,11 +73,34 @@ export const usersRouter = createTRPCRouter({
         where: { wallet: input.wallet },
       });
 
-      if (!user) {
-        throw new Error("No existe el usuario");
-      }
+      // if (!user) {
+      //   throw new Error("No existe el usuario");
+      // }
 
-      return user;
+      return user ?? null;
+    }),
+
+  updateUserById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        data: z.object({
+          email: z.string().email().optional(),
+          bio: z.string().optional(),
+          website: z.string().optional(),
+          avatar_url: z.string().optional(),
+          banner_url: z.string().optional(),
+        }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Update a user in the database using Prisma
+      const updatedUser = await ctx.db.user.update({
+        where: { id: input.id },
+        data: input.data,
+      });
+
+      return updatedUser;
     }),
 
   deleteUserById: publicProcedure

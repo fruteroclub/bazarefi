@@ -114,7 +114,7 @@ const theme = extendTheme({
     },
     Modal: {
       baseStyle: {
-        dialog: { background: "brandDarkPurple" },
+        dialog: { background: "secondary" },
       },
     },
     Spinner: {
