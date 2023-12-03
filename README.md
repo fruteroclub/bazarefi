@@ -21,3 +21,8 @@ Un proyecto creado con [T3 Stack](https://create.t3.gg/), en el cual utilizamos 
 ## Contratos inteligentes
 
 [Repositorio contratos inteligentes](https://github.com/fruteroclub/bazarefi-contracts)
+
+## Direcciones contratos inteligentes (desplegados en Celo Alfajores)
+
+- ERC20 en celoAlfajores: 0x762b1fcE1FE406D3b05c111D5b57B9CB37317D91
+- BazarefiAttestation (ERC721) en celoAlfajores: 0xe402565fD03Ab887fC09c69e24a6c73A62e02e47
